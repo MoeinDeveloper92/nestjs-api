@@ -2,6 +2,7 @@ import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import * as os from 'os';
 import { AppLoggerService } from './tools/logging/app-logger/app-logger.service';
+import { ValidationPipe } from '@nestjs/common';
 
 function getHostIpAddress(): string | undefined {
   const interfaces = os.networkInterfaces();
@@ -27,8 +28,13 @@ async function bootstrap() {
   const app = await NestFactory.create(AppModule, {
     logger: loggerLevels,
   });
+  app.useGlobalPipes(
+    new ValidationPipe({
+      whitelist: true,
+    }),
+  );
   const logger = new AppLoggerService();
-  await app.listen(process.env.PORT ?? 5000, hostIP, () => {
+  await app.listen(process.env.PORT ?? 3333, '0.0.0.0', () => {
     logger.log(
       `The app is running on the porst:${5000}and the IP is ${hostIP}`,
     );
